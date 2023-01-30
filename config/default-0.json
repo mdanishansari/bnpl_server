@@ -1,3 +1,7 @@
 {
-    "jwtPrivateKey": ""
+    "jwtPrivateKey": "",
+    "flexi": {
+        "authToken": "",
+        "expires": 0
+    }
 }

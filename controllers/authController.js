@@ -1,7 +1,10 @@
 const jwt = require('jsonwebtoken');
 const config = require('config');
+const bcrypt = require('bcrypt');
 
 const Retailer = require('../models/retailer');
+const User = require('../models/user');
+const constants = require('../common/constants')
 
 exports.userlogin = (req, res, next) => {
     const tokenType = "BEARER";
@@ -33,6 +36,81 @@ exports.userlogin = (req, res, next) => {
             })
         })
 }
+
+exports.createDashboardUser = async (req, res, next) => {
+    const reqBody = req.body;
+    const pass = reqBody.password;
+    const salt = await bcrypt.genSalt(10);
+    const reqUser = req.user;
+    if (reqUser.userType != constants.dashboardUserType.SUPER_ADMIN) {
+        res.status(403).
+            json({
+                success: false,
+                message: "User creation forbidden."
+            })
+    }
+    reqBody.password = await bcrypt.hash(pass, salt);
+    const user = new User({
+        email: reqBody.email,
+        name: reqBody.name,
+        password: reqBody.password,
+        userType: constants.dashboardUserType.NORMAL_USER
+    })
+    user.save()
+        .then(userData => {
+            res.status(200)
+                .json({
+                    success: true,
+                    message: "User created"
+                })
+        })
+        .catch(error => {
+            console.log(error)
+            res.status(500).json({
+                success: false,
+                message: error.message
+            })
+        })
+}
+
+exports.dashboardUserlogin = (req, res, next) => {
+    const reqBody = req.body;
+    const loggedInEmail = reqBody.email.trim();
+    const loggedInPass = reqBody.password.trim();
+    User.findOne({ email: loggedInEmail })
+        .then(userData => {
+            if (!userData) {
+                return res
+                    .status(401)
+                    .json({
+                        success: false,
+                        message: 'Authentication Failure!.Email or password does not match.'
+                    })
+            }
+            const valid = bcrypt.compareSync(loggedInPass, userData.password);
+            if (!valid) {
+                return res
+                    .status(401)
+                    .json({
+                        message: 'Authentication Failure!.Email or password does not match.'
+                    })
+            }
+            const token = jwt
+                .sign(
+                    {
+                        id: userData.userId, type: account.userType, name: account.userName, branch: account.branch
+                    }, config.get('jwtPrivateKey'));
+        })
+        .catch(error => {
+            console.log(error)
+            res.status(500).json({
+                success: false,
+                message: error.message
+            })
+        })
+
+}
+
 
 function getRetailer(loginId) {
     return new Promise((resolve, reject) => {

@@ -1,3 +1,4 @@
+const path = require('path');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const express = require('express');
@@ -27,6 +28,7 @@ app.use(cors());
 
 const authRoutes = require('./routes/auth');
 const retailerRoutes = require('./routes/retailer');
+const dashboardRoutes = require('./routes/dashboard');
 
 // Server started check URL
 app.get('/', (req, res, next) => {
@@ -35,8 +37,11 @@ app.get('/', (req, res, next) => {
         .send('Server is running')
 });
 
-app.use('/api/v2/auth', authRoutes);
-app.use('/api/v2/retailer', retailerRoutes);
+app.use('/images', express.static(path.join(__dirname, 'images')))
+
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/retailer', retailerRoutes);
+app.use('/api/v1/dashboard', dashboardRoutes);
 
 // No url found
 app.use('/', (req, res, next) => {

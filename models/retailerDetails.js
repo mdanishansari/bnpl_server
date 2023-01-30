@@ -20,7 +20,15 @@ const retailerDetailsSchema = new Schema({
     state: { type: String },
     pincode: { type: String, required: true },
     amount: { type: Number },
+    status: { type: String },
     consent: { type: Boolean, required: true },
+    docPath: { type: String },
+    gstPath: { type: String },
+    docType: { type: String, default: 'none' },
+    docValue: { type: String, default: constants.ImageValue.PENDING },
+    gstValue: { type: String, default: constants.ImageValue.PENDING },
+    loanCode: { type: String },
+    leadCode: { type: String },
     createDate: { type: Date, required: true, default: Date.now },
     lastUpdate: { type: Date, default: null }
 })

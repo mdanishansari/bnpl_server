@@ -3,7 +3,7 @@ module.exports = {
     script: 'server.js',
     watch: true,
     time: true,
-    ignore_watch: ["node_modules"]
+    ignore_watch: ["node_modules", "images", ".git"]
   }],
 
   deploy: {
